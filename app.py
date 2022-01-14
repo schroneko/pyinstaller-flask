@@ -1,6 +1,8 @@
 import os
 import pathlib
 import sys
+import threading
+import webbrowser
 
 from flask import (
     Flask,
@@ -64,4 +66,6 @@ def uploaded_file(filename):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, threaded=True)
+    threading.Timer(1.0, lambda: webbrowser.open("http://localhost:5000")).start()
+    # app.run(debug=True, port=5000, threaded=True)
+    app.run(debug=False, port=5000, threaded=True)
