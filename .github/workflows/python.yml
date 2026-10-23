@@ -1,0 +1,31 @@
+name: Python compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e
+        with:
+          enable-cache: false
+      - run: uv venv
+      - run: uv pip install --python .venv/bin/python -r requirements.txt
+      - run: uv pip check --python .venv/bin/python
+      - run: uvx pip-audit --strict --progress-spinner off --path .venv/lib/python3.11/site-packages
+      - run: uv run --python .venv/bin/python python -m unittest discover -s tests -v
